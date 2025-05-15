@@ -1,43 +1,38 @@
 package Modelo;
-import java.util.ArrayList;
+
+import RepositoryPattern.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ServicioBancario {
-    private List<Cuenta> cuentas = new ArrayList<>();
-    private List<Movimiento> movimientos = new ArrayList<>();
-    private int nextId = 1; // Contador para IDs automáticos
+    private CuentaRepository cuentaRepo;
+    private MovimientoRepository movimientoRepo;
 
-
-    public synchronized void agregarCuenta(Cuenta cuenta) {
-        cuentas.add(cuenta);
+    public ServicioBancario(CuentaRepository cuentaRepo, MovimientoRepository movimientoRepo) {
+        this.cuentaRepo = cuentaRepo;
+        this.movimientoRepo = movimientoRepo;
     }
 
-    public synchronized List<Cuenta> getCuentas() {
-        return new ArrayList<>(cuentas); // Devuelve copia para evitar modificaciones
-    }
-    public List<Movimiento> getMovimientosPorCuenta(int cuentaId) {
-        return movimientos.stream()
-                .filter(m -> m.getCuentaId() == cuentaId)
-                .toList();
-    }
-    // Método para agregar movimientos
-    public void agregarMovimiento(Movimiento movimiento) {
-        movimientos.add(movimiento);
+    public void agregarCuenta(Cuenta cuenta) {
+        cuentaRepo.guardar(cuenta);
     }
 
-    // Método para buscar cuentas por ID
-    public List<Cuenta> buscarCuentasPorDni(String dni) {
-        return cuentas.stream()
-                .filter(c -> c.getDniTitular().equals(dni))
-                .collect(Collectors.toList());
+    public List<Cuenta> getCuentas() {
+        return cuentaRepo.buscarTodos();
     }
 
     public Cuenta buscarCuentaPorId(int id) {
-        return cuentas.stream()
-                .filter(cuenta -> cuenta.getId() == id)
-                .findFirst()
-                .orElse(null);
+        return cuentaRepo.buscarPorId(id); // 🔧 Este es el método que faltaba
     }
 
+    public void agregarMovimiento(Movimiento movimiento) {
+        movimientoRepo.guardarMovimiento(movimiento);
+    }
+
+    public List<Movimiento> getMovimientosPorCuenta(int cuentaId) {
+        return movimientoRepo.buscarMovimientoPorCuentaId(cuentaId);
+    }
+
+    public List<Cuenta> buscarCuentasPorDni(String dni) {
+        return cuentaRepo.buscarPorDni(dni);
+    }
 }

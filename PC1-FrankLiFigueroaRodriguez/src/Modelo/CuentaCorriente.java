@@ -12,4 +12,8 @@ public class CuentaCorriente extends Cuenta {
     public boolean puedeRetirar(double monto) {
         return getSaldo() + limite >= monto;
     }
+
+    public double getLimite() {
+        return limite;
+    }
 }
